@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:open_hygiene/screens/settings_screen.dart';
+import 'package:open_hygiene/screens/profile_screen.dart';
 import 'package:open_hygiene/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,12 +24,25 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  String _getTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'Search';
+      case 1:
+        return 'Favorites';
+      case 2:
+        return 'Profile';
+      default:
+        return 'Open Hygien';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Open Hygien'),
+        title: Text(_getTitle(_selectedIndex)),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.logout),
@@ -49,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text('Search Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
           Text('Favorites Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-          SettingsScreen(),
+          ProfileScreen(),
         ],
       ),
 
@@ -64,8 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Favorites',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.person),
+            label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,
