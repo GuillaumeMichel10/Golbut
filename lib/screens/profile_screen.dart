@@ -23,7 +23,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       DocumentSnapshot userData = await FirebaseFirestore.instance.collection('users').doc(user!.uid).get();
       if (userData.exists) {
         setState(() {
-          _photoURL = userData['photoURL'] ?? 'https://avatars.githubusercontent.com/u/114534';
+          _photoURL = userData['photoURL'] ?? 'https://avatars.githubusercontent.com/u/1';
+          print('Photo URL: $_photoURL');
         });
       }
     }
@@ -36,12 +37,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-          ProfilePicture(
-            name: '',
-            radius: 80,
-            fontsize: 40,
-            img: _photoURL,
-          ),
+            Image.network(
+              _photoURL ?? 'https://avatars.githubusercontent.com/u/56789',
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                return const Text('Image non disponible');
+              },
+            ),
             const SizedBox(height: 20),
             Text(
               'Email: ${user?.email ?? 'Non disponible'}',
