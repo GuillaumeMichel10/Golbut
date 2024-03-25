@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:open_hygiene/screens/profile_screen.dart';
+import 'package:open_hygiene/screens/result_page.dart';
+import 'package:open_hygiene/screens/search_page.dart';
 import 'package:open_hygiene/services/auth_service.dart';
+
+import '../models/establishment_model.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -10,6 +14,21 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+  Future<List<Establishment>>? _futureEstablishment;
+  Map<String, TextEditingController> textEditingControllerMap = {};
+
+  String? _selectedFilter;
+  String? _selectedTown;
+  String? _selectedName;
+
+  @override
+  void initState() {
+    super.initState();
+    _futureEstablishment = fetchEstablishment();
+    textEditingControllerMap['filter'] = TextEditingController();
+    textEditingControllerMap['town'] = TextEditingController();
+    textEditingControllerMap['name'] = TextEditingController();
+  }
 
   @override
   void dispose() {
@@ -20,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      _pageController.animateToPage(index, duration: Duration(milliseconds: 500), curve: Curves.easeInOut);
+      _pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
     });
   }
 
@@ -60,8 +79,29 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         },
         children: [
-          Text('Search Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
-          Text('Favorites Page', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold)),
+          SearchPage(establishment: _futureEstablishment,
+              textEditingControllerMap: textEditingControllerMap,
+              onSelectedFilterChanged: (newFilter) {
+                setState(() {
+                  _selectedFilter = newFilter;
+                });
+              },
+              onSelectedTownChanged: (newTown) {
+                setState(() {
+                  _selectedTown = newTown;
+                });
+              },
+              onSelectedNameChanged: (newName) {
+                setState(() {
+                  _selectedName = newName;
+                });
+              },
+          ),
+          ResultPage(establishment: _futureEstablishment,
+              selectedFilter: _selectedFilter,
+            selectedTown: _selectedTown,
+            selectedName: _selectedName,
+          ),
           ProfileScreen(),
         ],
       ),
