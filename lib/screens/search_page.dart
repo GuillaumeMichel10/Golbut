@@ -28,11 +28,17 @@ class _SearchPageState extends State<SearchPage> {
   String? selectedTown;
   String? selectedName;
   late FocusScopeNode _focusScopeNode;
+  late SuggestionsController<String> filterController;
+  late SuggestionsController<String> townController;
+  late SuggestionsController<String> nameController;
 
   @override
   void initState() {
     super.initState();
     _focusScopeNode = FocusScopeNode();
+    filterController = SuggestionsController();
+    townController = SuggestionsController();
+    nameController = SuggestionsController();
   }
 
   @override
@@ -133,6 +139,7 @@ class _SearchPageState extends State<SearchPage> {
                   _buildRatingSystem(),
                   SizedBox(height: 20),
                   TypeAheadField<String>(
+                    suggestionsController: filterController,
                     builder: (context, controller, focusNode) {
                       return TextField(
                           controller: controller,
@@ -155,6 +162,8 @@ class _SearchPageState extends State<SearchPage> {
                         selectedFilter = value;
                       });
                       widget.onSelectedFilterChanged(value);
+                      townController.refresh();
+                      nameController.refresh();
                     },
                     suggestionsCallback: (String search) {
                       widget.onSelectedFilterChanged("");
@@ -181,6 +190,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   const SizedBox(height: 20),
                   TypeAheadField<String>(
+                    suggestionsController: townController,
                     builder: (context, controller, focusNode) {
                       return TextField(
                           controller: controller,
@@ -203,6 +213,8 @@ class _SearchPageState extends State<SearchPage> {
                         selectedTown = value;
                       });
                       widget.onSelectedTownChanged(value);
+                      filterController.refresh();
+                      nameController.refresh();
                     },
                     suggestionsCallback: (String search) {
                       widget.onSelectedTownChanged("");
@@ -224,6 +236,7 @@ class _SearchPageState extends State<SearchPage> {
                   ),
                   SizedBox(height: 20),
                   TypeAheadField<String>(
+                    suggestionsController: nameController,
                     builder: (context, controller, focusNode) {
                       return TextField(
                           controller: controller,
@@ -246,6 +259,8 @@ class _SearchPageState extends State<SearchPage> {
                         selectedName = value;
                       });
                       widget.onSelectedNameChanged(value);
+                      filterController.refresh();
+                      townController.refresh();
                     },
                     suggestionsCallback: (String search) {
                       widget.onSelectedNameChanged("");
