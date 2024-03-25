@@ -27,10 +27,18 @@ class _SearchPageState extends State<SearchPage> {
   String? selectedFilter;
   String? selectedTown;
   String? selectedName;
+  late FocusScopeNode _focusScopeNode;
 
   @override
   void initState() {
     super.initState();
+    _focusScopeNode = FocusScopeNode();
+  }
+
+  @override
+  void dispose() {
+    _focusScopeNode.dispose();
+    super.dispose();
   }
 
   Future<Set<String>> _filterFilters() async {
@@ -90,165 +98,177 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                'Bienvenue sur OpenHygiène',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+    return GestureDetector(
+      onTap: () {
+        // Perdre le focus lorsque l'utilisateur tape en dehors du TypeAheadField
+        _focusScopeNode.unfocus();
+      },
+      child: FocusScope(
+        node: _focusScopeNode,
+        child: Scaffold(
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    'Bienvenue sur OpenHygiène',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'OpenHygiène est une application conçue pour vous aider à trouver des informations sur les établissements alimentaires en fonction de leur niveau d\'hygiène.',
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Vous pouvez rechercher des établissements par leur nom, leur adresse ou leur ville, et obtenir des informations détaillées sur leur niveau d\'hygiène.',
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20),
+                  _buildRatingSystem(),
+                  SizedBox(height: 20),
+                  TypeAheadField<String>(
+                    builder: (context, controller, focusNode) {
+                      return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Filtre',
+                          ));
+                    },
+                    controller: widget.textEditingControllerMap['filter'],
+                    itemBuilder: (BuildContext context, String value) {
+                      return ListTile(
+                        title: Text(value),
+                      );
+                    },
+                    onSelected: (String value) {
+                      setState(() {
+                        widget.textEditingControllerMap['filter']?.text = value;
+                        selectedFilter = value;
+                      });
+                      widget.onSelectedFilterChanged(value);
+                    },
+                    suggestionsCallback: (String search) {
+                      widget.onSelectedFilterChanged("");
+                      return _filterFilters().then((filters) {
+                        return filters
+                            .where((filter) =>
+                            filter.toLowerCase().contains(search.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                    loadingBuilder: (BuildContext context) {
+                      return const CircularProgressIndicator();
+                    },
+                    decorationBuilder: (context, child) {
+                      return Material(
+                        type: MaterialType.card,
+                        elevation: 4,
+                        borderRadius: BorderRadius.circular(8),
+                        child: child,
+                      );
+                    },
+                    offset: const Offset(0, 12),
+                    constraints: const BoxConstraints(maxHeight: 500),
+                  ),
+                  const SizedBox(height: 20),
+                  TypeAheadField<String>(
+                    builder: (context, controller, focusNode) {
+                      return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Commune',
+                          ));
+                    },
+                    controller: widget.textEditingControllerMap['town'],
+                    itemBuilder: (BuildContext context, String value) {
+                      return ListTile(
+                        title: Text(value),
+                      );
+                    },
+                    onSelected: (String value) {
+                      setState(() {
+                        widget.textEditingControllerMap['town']?.text = value;
+                        selectedTown = value;
+                      });
+                      widget.onSelectedTownChanged(value);
+                    },
+                    suggestionsCallback: (String search) {
+                      widget.onSelectedTownChanged("");
+                      return _filterTowns(search);
+                    },
+                    loadingBuilder: (BuildContext context) {
+                      return const CircularProgressIndicator();
+                    },
+                    decorationBuilder: (context, child) {
+                      return Material(
+                        type: MaterialType.card,
+                        elevation: 4,
+                        borderRadius: BorderRadius.circular(8),
+                        child: child,
+                      );
+                    },
+                    offset: const Offset(0, 12),
+                    constraints: const BoxConstraints(maxHeight: 500),
+                  ),
+                  SizedBox(height: 20),
+                  TypeAheadField<String>(
+                    builder: (context, controller, focusNode) {
+                      return TextField(
+                          controller: controller,
+                          focusNode: focusNode,
+                          autofocus: true,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Nom',
+                          ));
+                    },
+                    controller: widget.textEditingControllerMap['name'],
+                    itemBuilder: (BuildContext context, String value) {
+                      return ListTile(
+                        title: Text(value),
+                      );
+                    },
+                    onSelected: (String value) {
+                      setState(() {
+                        widget.textEditingControllerMap['name']?.text = value;
+                        selectedName = value;
+                      });
+                      widget.onSelectedNameChanged(value);
+                    },
+                    suggestionsCallback: (String search) {
+                      widget.onSelectedNameChanged("");
+                      return _filterName(search);
+                    },
+                    loadingBuilder: (BuildContext context) {
+                      return const CircularProgressIndicator();
+                    },
+                    decorationBuilder: (context, child) {
+                      return Material(
+                        type: MaterialType.card,
+                        elevation: 4,
+                        borderRadius: BorderRadius.circular(8),
+                        child: child,
+                      );
+                    },
+                    offset: const Offset(0, 12),
+                    constraints: const BoxConstraints(maxHeight: 500),
+                  ),
+                  SizedBox(height: 400),
+                ],
               ),
-              SizedBox(height: 20),
-              Text(
-                'OpenHygiène est une application conçue pour vous aider à trouver des informations sur les établissements alimentaires en fonction de leur niveau d\'hygiène.',
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 20),
-              Text(
-                'Vous pouvez rechercher des établissements par leur nom, leur adresse ou leur ville, et obtenir des informations détaillées sur leur niveau d\'hygiène.',
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 20),
-              _buildRatingSystem(),
-              SizedBox(height: 20),
-              TypeAheadField<String>(
-                builder: (context, controller, focusNode) {
-                  return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Filtre',
-                      ));
-                },
-                controller: widget.textEditingControllerMap['filter'],
-                itemBuilder: (BuildContext context, String value) {
-                  return ListTile(
-                    title: Text(value),
-                  );
-                },
-                onSelected: (String value) {
-                  setState(() {
-                    widget.textEditingControllerMap['filter']?.text = value;
-                    selectedFilter = value;
-                  });
-                  widget.onSelectedFilterChanged(value);
-                },
-                suggestionsCallback: (String search) {
-                  return _filterFilters().then((filters) {
-                    return filters
-                        .where((filter) =>
-                        filter.toLowerCase().contains(search.toLowerCase()))
-                        .toList();
-                  });
-                },
-                loadingBuilder: (BuildContext context) {
-                  return const CircularProgressIndicator();
-                },
-                decorationBuilder: (context, child) {
-                  return Material(
-                    type: MaterialType.card,
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(8),
-                    child: child,
-                  );
-                },
-                offset: const Offset(0, 12),
-                constraints: const BoxConstraints(maxHeight: 500),
-              ),
-              const SizedBox(height: 20),
-              TypeAheadField<String>(
-                builder: (context, controller, focusNode) {
-                  return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Commune',
-                      ));
-                },
-                controller: widget.textEditingControllerMap['town'],
-                itemBuilder: (BuildContext context, String value) {
-                  return ListTile(
-                    title: Text(value),
-                  );
-                },
-                onSelected: (String value) {
-                  setState(() {
-                    widget.textEditingControllerMap['town']?.text = value;
-                    selectedTown = value;
-                  });
-                  widget.onSelectedTownChanged(value);
-                },
-                suggestionsCallback: (String search) {
-                  return _filterTowns(search);
-                },
-                loadingBuilder: (BuildContext context) {
-                  return const CircularProgressIndicator();
-                },
-                decorationBuilder: (context, child) {
-                  return Material(
-                    type: MaterialType.card,
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(8),
-                    child: child,
-                  );
-                },
-                offset: const Offset(0, 12),
-                constraints: const BoxConstraints(maxHeight: 500),
-              ),
-              SizedBox(height: 20),
-              TypeAheadField<String>(
-                builder: (context, controller, focusNode) {
-                  return TextField(
-                      controller: controller,
-                      focusNode: focusNode,
-                      autofocus: true,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Nom',
-                      ));
-                },
-                controller: widget.textEditingControllerMap['name'],
-                itemBuilder: (BuildContext context, String value) {
-                  return ListTile(
-                    title: Text(value),
-                  );
-                },
-                onSelected: (String value) {
-                  setState(() {
-                    widget.textEditingControllerMap['name']?.text = value;
-                    selectedName = value;
-                  });
-                  widget.onSelectedNameChanged(value);
-                },
-                suggestionsCallback: (String search) {
-                  return _filterName(search);
-                },
-                loadingBuilder: (BuildContext context) {
-                  return const CircularProgressIndicator();
-                },
-                decorationBuilder: (context, child) {
-                  return Material(
-                    type: MaterialType.card,
-                    elevation: 4,
-                    borderRadius: BorderRadius.circular(8),
-                    child: child,
-                  );
-                },
-                offset: const Offset(0, 12),
-                constraints: const BoxConstraints(maxHeight: 500),
-              ),
-              SizedBox(height: 500),
-            ],
+            ),
           ),
         ),
       ),

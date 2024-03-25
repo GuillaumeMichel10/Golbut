@@ -43,23 +43,26 @@ class _ResultPageState extends State<ResultPage> {
     List<Establishment> establishments = await widget.establishment!;
 
     establishments = establishments.where((establishment) {
-      bool filterMatch = widget.selectedFilter != null ? establishment.filter
-          ?.contains(widget.selectedFilter!) ?? false : true;
-      bool townMatch = widget.selectedTown != null ? establishment.town ==
-          widget.selectedTown : true;
-      bool nameMatch = widget.selectedName != null ? establishment.name ==
-          widget.selectedName : true;
+      String selectedFilterLowerCase = widget.selectedFilter?.toLowerCase() ?? "";
+      String selectedTownLowerCase = widget.selectedTown?.toLowerCase() ?? "";
+      String selectedNameLowerCase = widget.selectedName?.toLowerCase() ?? "";
+
+      bool filterMatch = widget.selectedFilter != null && widget.selectedFilter!.isNotEmpty
+          ? (establishment.filter?.map((f) => f.toLowerCase()).contains(selectedFilterLowerCase) ?? false)
+          : true;
+      bool townMatch = widget.selectedTown != null && widget.selectedTown!.isNotEmpty
+          ? (establishment.town?.toLowerCase().startsWith(selectedTownLowerCase) ?? false)
+          : true;
+      bool nameMatch = widget.selectedName != null && widget.selectedName!.isNotEmpty
+          ? (establishment.name?.toLowerCase().startsWith(selectedNameLowerCase) ?? false)
+          : true;
 
       return filterMatch && townMatch && nameMatch;
     }).toList();
 
-    print(widget.selectedFilter);
-    print(widget.selectedTown);
-    print(widget.selectedName);
-
-
     return establishments;
   }
+
 
 
   @override

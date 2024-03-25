@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 0:
         return 'Search';
       case 1:
-        return 'Favorites';
+        return 'Results';
       case 2:
         return 'Profile';
       default:
@@ -113,8 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
+            icon: Icon(Icons.assignment_outlined),
+            label: 'Results',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
