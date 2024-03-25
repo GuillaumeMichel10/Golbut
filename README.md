@@ -36,3 +36,9 @@ Les contributions à HygieneChecker sont les bienvenues !
 Licence
 Ce projet est sous licence MIT. Pour plus d'informations, 
 veuillez consulter le fichier LICENSE.
+
+Developpeurs :
+    - MICHEL Guillaume
+    - DELOT Geoffrey
+    - CANOT Aloïs
+    - MICHEL Julien
