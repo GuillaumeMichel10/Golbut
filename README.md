@@ -29,6 +29,9 @@ Technologies utilisées
 Flutter : Framework multiplateforme pour le développement d'applications mobiles.
 Firebase : Utilisé pour l'authentification des utilisateurs et le stockage des données.
 
+Ce projet est sous licence MIT. Pour plus d'informations, 
+veuillez consulter le fichier LICENSE.
+
 Contributions
 Les contributions à OpenHygien sont les bienvenues !
 
