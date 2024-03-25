@@ -113,8 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'Search',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.assignment_outlined),
-            label: 'Results',
+            icon: Icon(Icons.business),
+            label: 'Facilities',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
