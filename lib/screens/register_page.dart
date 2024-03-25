@@ -1,4 +1,8 @@
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:path/path.dart' as Path;
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:open_hygiene/screens/login_page.dart';
 import 'package:open_hygiene/services/auth_service.dart';
 
@@ -15,6 +19,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String password = '';
   String city = '';
   String error = '';
+  File? _imageFile;
+
+  Future pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedFile != null) {
+        _imageFile = File(pickedFile.path);
+      } else {
+        print('No image selected.');
+      }
+    });
+  }
+
+  Future<String?> uploadFile() async {
+    if (_imageFile == null) return null;
+
+    String fileName = Path.basename(_imageFile!.path);
+    firebase_storage.Reference ref = firebase_storage.FirebaseStorage.instance.ref().child('profile_pictures/$fileName');
+    firebase_storage.UploadTask uploadTask = ref.putFile(_imageFile!);
+    await uploadTask.whenComplete(() => {});
+    String fileURL = await ref.getDownloadURL();
+    return fileURL;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +58,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              ElevatedButton(
+                onPressed: pickImage,
+                child: const Text('Choisir une photo de profil'),
+              ),
+              _imageFile != null ? Image.file(_imageFile!, height: 100) : const Padding(padding: EdgeInsets.symmetric(vertical: 20),
+                child: Text("Aucune image sélectionnée"),
+              ),
               TextFormField(
                 validator: (val) => val!.isEmpty ? 'Entrez un email' : null,
                 onChanged: (val) {
@@ -94,7 +130,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: const Text("S'inscrire"),
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    dynamic result = await _auth.registerWithEmailAndPassword(email, password, city);
+                    String? photoURL = await uploadFile();
+                    dynamic result = await _auth.registerWithEmailAndPassword(email, password, city, photoURL);
                     if (result == null) {
                       setState(() => error = 'Veuillez fournir une adresse email valide');
                     } else {

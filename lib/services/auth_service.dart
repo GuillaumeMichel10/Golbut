@@ -9,7 +9,7 @@ class AuthService {
     return user != null ? UserModel(uid: user.uid, email: user.email) : null;
   }
 
-  Future<UserModel?> registerWithEmailAndPassword(String email, String password, String city) async {
+  Future<UserModel?> registerWithEmailAndPassword(String email, String password, String city, String? photoURL) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
@@ -18,6 +18,7 @@ class AuthService {
           'uid': user.uid,
           'email': email,
           'city': city,
+          'photoURL': photoURL ?? '',
         });
         return UserModel(uid: user.uid, email: user.email, city: city);
       }
